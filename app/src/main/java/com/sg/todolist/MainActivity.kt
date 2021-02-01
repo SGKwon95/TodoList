@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         //로그인 안 됨
-        FirebaseAuth.getInstance().currentUser?.let {
+
+        if(FirebaseAuth.getInstance().currentUser == null) {
             login()
         }
 
@@ -147,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
 data class Todo(
     val text: String,
-    var isDone: Boolean = false
+    var done: Boolean = false
 )
 
 class TodoAdapter(
@@ -172,7 +173,7 @@ class TodoAdapter(
         val todo = dataSet[position]
         viewHolder.binding.todoText.text = todo.getString("text") ?: ""
 
-        if (todo.getBoolean("isDone") ?: false) {
+        if (todo.getBoolean("done") ?: false) {
             //할 일 완료
             viewHolder.binding.todoText.apply {
                 paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -283,8 +284,8 @@ class MainViewModel: ViewModel() {
         //update
         FirebaseAuth.getInstance().currentUser?.let { user ->
             // user가 null이 아닐 경우 실행(let) 된다
-            val isDone = todo.getBoolean("isDone") ?: false
-            db.collection(user.uid).document(todo.id).update("isDone",!isDone)
+            val isDone = todo.getBoolean("done") ?: false
+            db.collection(user.uid).document(todo.id).update("done",!isDone)
         }
         //todo.isDone = !todo.isDone
 //        todoLiveData.value = data
